@@ -1,34 +1,20 @@
-from pydantic import BaseModel, Field
 from typing import Annotated
+from sqlmodel import SQLModel, Field
 
 
-class BookPatch(BaseModel):
-    title: str | None = None
-    author: str | None = None
-
-
-class Book(BaseModel):
-    id: int
+class BookBase(SQLModel):
     title: str
     author: str
-    review: Annotated[int, Field(ge=1, le=5)] = None  # campo opzionale --> lo imposto di default come None
-
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "id": 1,
-                    "title": "Il nome della Rosa",
-                    "author": "Umberto Eco",
-                    "review": 5
-                }
-            ]
-        }
-    }
+    review: Annotated[int, Field(ge=1, le=5)] = None
 
 
-books = {
-    0: Book(id=0, title="Il nome della Rosa", author="Umberto Eco", review=5),
-    1: Book(id=1, title="Il gioco dei sei colori", author="Agatha Christie", review=4),
-    2: Book(id=2, title="Il Signore degli Anelli", author="J.R.R. Tolkien", review=5)
-}
+class BookCreate(BookBase):
+    pass
+
+
+class BookPublic(BookBase):
+    id: int
+
+
+class BookDB(BookBase, tablle=True):
+    id: int = Field(default=None, primary_key=True)
